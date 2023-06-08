@@ -3,7 +3,7 @@
 ## Docker
 
 ### Build & Push
-`TangerieOrg/Workflows/.github/workflows/docker-build-push.yml`
+`TangerieOrg/Workflows/.github/workflows/docker-build-push.yml@main`
 
 **Inputs**
 ```yml
@@ -31,7 +31,7 @@ path:
 **Example**
 ```yml
 build-api:
-  uses: TangerieOrg/Workflows/.github/workflows/docker-build-push.yml
+  uses: TangerieOrg/Workflows/.github/workflows/docker-build-push.yml@main
   with:
     image_name: everything-codex-api
     registry_name: docker.tangerie.xyz
@@ -41,7 +41,7 @@ build-api:
 ```
 
 ### Deploy
-`TangerieOrg/Workflows/.github/workflows/docker-deploy.yml`
+`TangerieOrg/Workflows/.github/workflows/docker-deploy.yml@main`
 
 **Inputs**
 ```yml
@@ -65,7 +65,7 @@ compose_file_path:
 **Examples**
 ```yml
 deploy:
-  uses: TangerieOrg/Workflows/.github/workflows/docker-deploy.yml
+  uses: TangerieOrg/Workflows/.github/workflows/docker-deploy.yml@main
   needs: 
     - build-api
     - build-frontend
