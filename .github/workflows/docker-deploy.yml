@@ -39,4 +39,4 @@ jobs:
           clean: true
 
       - name: Run image
-        run: docker stack deploy -c ${{inputs.compose_file_path}} ${{inputs.image_name}}
+        run: docker stack deploy --prune -c ${{inputs.compose_file_path}} ${{inputs.image_name}}
