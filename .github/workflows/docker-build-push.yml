@@ -36,7 +36,7 @@ on:
 
 jobs:
   check-changes:
-    runs-on: [self-hosted, media]
+    runs-on: [self-hosted, builder]
     outputs:
       value: ${{ steps.changes.outputs.source }}
     steps:
@@ -56,7 +56,7 @@ jobs:
         run: echo File Changes in ${{ inputs.path }} = ${{ steps.changes.outputs.source }}
 
   docker-build-push:
-    runs-on: [self-hosted, media]
+    runs-on: [self-hosted, builder]
     needs: check-changes
     if: needs.check-changes.outputs.value == 'true'
     steps:
@@ -88,7 +88,7 @@ jobs:
       - name: Print data
         run: echo Building to ${{inputs.registry_name}}/${{inputs.image_name}} ${{env.CURRENT_TAG}}
 
-      - name: Build and push web image
+      - name: Build and push image (${{inputs.registry_name}}/${{inputs.image_name}})
         run: >
           docker buildx build 
           --push

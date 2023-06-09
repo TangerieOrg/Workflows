@@ -30,7 +30,7 @@ env:
 jobs:
   docker-deploy:
     name: Deploys docker image to swarm
-    runs-on: [self-hosted, media]
+    runs-on: [self-hosted, compose]
     steps:
       - name: Pull repo
         uses: actions/checkout@v3
