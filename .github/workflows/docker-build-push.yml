@@ -26,7 +26,14 @@ on:
         default: "."
         required: false
         type: string
-      
+      build_args:
+        default: ""
+        required: false
+        type: string
+      force_build:
+        default: "false"
+        required: false
+        type: string
 
     secrets:
       DOCKER_USERNAME:
@@ -58,7 +65,7 @@ jobs:
   docker-build-push:
     runs-on: [self-hosted, builder]
     needs: check-changes
-    if: needs.check-changes.outputs.value == 'true'
+    if: needs.check-changes.outputs.value == 'true' || inputs.force_build == 'true'
     steps:
       - name: Pull repo
         uses: actions/checkout@v3
@@ -98,4 +105,5 @@ jobs:
           --build-arg OPENAI_KEY=${{secrets.OPENAI_KEY}}
           --build-arg FONT_AWESOME_KEY=${{secrets.FONT_AWESOME_KEY}}
           --build-arg NPM_TOKEN=${{secrets.NPM_TOKEN}}
+          ${{inputs.build_args}}
           ${{inputs.path}}
