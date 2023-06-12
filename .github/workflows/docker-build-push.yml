@@ -105,5 +105,6 @@ jobs:
           --build-arg OPENAI_KEY=${{secrets.OPENAI_KEY}}
           --build-arg FONT_AWESOME_KEY=${{secrets.FONT_AWESOME_KEY}}
           --build-arg NPM_TOKEN=${{secrets.NPM_TOKEN}}
+          --build-arg PRIVATE_NPM_TOKEN=${{secrets.PRIVATE_NPM_TOKEN}}
           ${{inputs.build_args}}
           ${{inputs.path}}
