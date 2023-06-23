@@ -73,6 +73,9 @@ jobs:
           submodules: true
           clean: true
           ref: ${{ inputs.ref }}
+          lfs: true
+      - name: LFS
+        run: git lfs checkout
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
