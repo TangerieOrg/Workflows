@@ -17,6 +17,10 @@ on:
           default: "docker.tangerie.xyz"
           required: false
           type: string
+      path:
+        default: "."
+        required: false
+        type: string
       build_args:
         default: ""
         required: false
@@ -37,7 +41,6 @@ jobs:
         with:
           submodules: true
           clean: true
-          ref: ${{ inputs.ref }}
           lfs: true
       - name: LFS
         run: git lfs checkout
