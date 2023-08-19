@@ -35,8 +35,9 @@ jobs:
       - name: Pull repo
         uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: 'recursive'
           clean: true
+          lfs: true
 
       - name: Run image
         run: docker stack deploy --prune -c ${{inputs.compose_file_path}} ${{inputs.image_name}}

@@ -17,21 +17,12 @@ on:
           default: "docker.tangerie.xyz"
           required: false
           type: string
-      ref:
-        description: "branch"
-        default: ""
-        required: true
-        type: string
       path:
         default: "."
         required: false
         type: string
       build_args:
         default: ""
-        required: false
-        type: string
-      force_build:
-        default: "false"
         required: false
         type: string
 
@@ -42,31 +33,8 @@ on:
           required: true
 
 jobs:
-  check-changes:
-    runs-on: [self-hosted, builder]
-    outputs:
-      value: ${{ steps.changes.outputs.source }}
-    steps:
-      - name: Pull repo
-        uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-          clean: true
-          lfs: true
-          ref: ${{ inputs.ref }}
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            source:
-              - '${{inputs.path}}/**'
-      - name: Debug
-        run: echo File Changes in ${{ inputs.path }} = ${{ steps.changes.outputs.source }}
-
   docker-build-push:
     runs-on: [self-hosted, builder]
-    needs: check-changes
-    if: needs.check-changes.outputs.value == 'true' || inputs.force_build == 'true'
     steps:
       - name: Pull repo
         uses: actions/checkout@v3
@@ -74,7 +42,6 @@ jobs:
           submodules: 'recursive'
           clean: true
           lfs: true
-          ref: ${{ inputs.ref }}
       - name: LFS
         run: git lfs checkout
 
@@ -106,9 +73,5 @@ jobs:
           --platform ${{env.ARCH_LIST}}
           -t ${{inputs.registry_name}}/${{inputs.image_name}}:${{env.CURRENT_TAG}}
           -t ${{inputs.registry_name}}/${{inputs.image_name}}:latest
-          --build-arg OPENAI_KEY=${{secrets.OPENAI_KEY}}
-          --build-arg FONT_AWESOME_KEY=${{secrets.FONT_AWESOME_KEY}}
-          --build-arg NPM_TOKEN=${{secrets.NPM_TOKEN}}
-          --build-arg PRIVATE_NPM_TOKEN=${{secrets.PRIVATE_NPM_TOKEN}}
           ${{inputs.build_args}}
           ${{inputs.path}}
