@@ -1,0 +1,69 @@
+name: (Reusable) Docker build then push to GHCR
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        description: "Image name (pushed as ghcr.io/<owner>/<image_name>)"
+        required: true
+        type: string
+      path:
+        default: "."
+        required: false
+        type: string
+      build_args:
+        default: ""
+        required: false
+        type: string
+      seed_from:
+        description: "Retag this existing image instead of building (one-off migration)"
+        default: ""
+        required: false
+        type: string
+
+jobs:
+  ghcr-build-push:
+    runs-on: [self-hosted, builder]
+    permissions:
+      contents: read
+      packages: write
+    concurrency:
+      group: ghcr-${{ inputs.image_name }}
+      cancel-in-progress: false
+    steps:
+      - name: Pull repo
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          clean: true
+          lfs: true
+
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ inputs.image_name }}" >> "$GITHUB_ENV"
+
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Seed
+        if: inputs.seed_from != ''
+        run: |
+          docker pull ${{ inputs.seed_from }}
+          echo "FROM ${{ inputs.seed_from }}" | docker build \
+            --label org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }} \
+            -t $IMAGE:latest -t $IMAGE:${{ github.sha }} -
+
+      - name: Build
+        if: inputs.seed_from == ''
+        run: >
+          docker build --pull
+          --label org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          -t $IMAGE:latest -t $IMAGE:${{ github.sha }}
+          ${{ inputs.build_args }}
+          ${{ inputs.path }}
+
+      - name: Push
+        run: docker push --all-tags $IMAGE
